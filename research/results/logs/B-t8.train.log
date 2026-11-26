@@ -1,0 +1,16 @@
+params=6504 vocab=292 train=321110
+epoch 1 loss=7.5442 dev=1.10% 25s
+epoch 2 loss=6.3681 dev=2.00% 31s
+epoch 3 loss=5.8654 dev=2.75% 37s
+epoch 4 loss=5.6420 dev=3.10% 37s
+epoch 5 loss=5.5344 dev=3.40% 36s
+epoch 6 loss=5.4733 dev=3.65% 36s
+epoch 7 loss=5.4376 dev=3.70% 26s
+epoch 8 loss=5.4150 dev=3.75% 25s
+epoch 9 loss=5.3999 dev=3.90% 23s
+epoch 10 loss=5.3898 dev=3.85% 21s
+epoch 11 loss=5.3829 dev=3.90% 20s
+epoch 12 loss=5.3782 dev=3.95% 20s
+epoch 13 loss=5.3748 dev=4.00% 23s
+epoch 14 loss=5.3725 dev=4.05% 23s
+epoch 15 loss=5.3709 dev=4.05% 24s

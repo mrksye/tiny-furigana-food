@@ -1,0 +1,62 @@
+{
+  "name": "@mrksye/tiny-furigana-food",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Neuro-symbolic Japanese furigana for food names in under 100 KB: rule-based candidates + a tiny linear CRF + a budgeted exception lexicon",
+  "author": "mrksye <mrksye@gmail.com>",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mrksye/tiny-furigana-food.git"
+  },
+  "homepage": "https://github.com/mrksye/tiny-furigana-food#readme",
+  "bugs": {
+    "url": "https://github.com/mrksye/tiny-furigana-food/issues"
+  },
+  "keywords": [
+    "furigana",
+    "japanese",
+    "g2p",
+    "neuro-symbolic",
+    "crf",
+    "nlp",
+    "typescript",
+    "tiny-ml",
+    "browser"
+  ],
+  "license": "MIT AND CC-BY-SA-4.0",
+  "main": "./dist/tiny-g2p.min.js",
+  "types": "./dist/tiny-g2p.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/tiny-g2p.d.ts",
+      "node": "./dist/node.js",
+      "default": "./dist/tiny-g2p.min.js"
+    },
+    "./model.bin": "./dist/model.bin",
+    "./model-100k.bin": "./dist/model-100k.bin"
+  },
+  "files": [
+    "dist/tiny-g2p.min.js",
+    "dist/node.js",
+    "dist/tiny-g2p.d.ts",
+    "dist/model.bin",
+    "dist/model-100k.bin",
+    "LICENSE",
+    "docs/DATA_SOURCES.md"
+  ],
+  "sideEffects": false,
+  "scripts": {
+    "test": "bun test",
+    "typecheck": "bunx tsc --noEmit",
+    "build": "bun run train/bundle.ts R-135k-ct 200000 R-100k-mf:model-100k.bin",
+    "bench": "bun run research/tools/bench.ts"
+  },
+  "devDependencies": {
+    "bun-types": "^1.4.5",
+    "typescript": "^7.0.2"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}

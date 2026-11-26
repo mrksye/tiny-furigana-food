@@ -1,0 +1,39 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 420" font-family="system-ui, sans-serif" font-size="12">
+<rect width="720" height="420" fill="#fff"/>
+<line x1="64" x2="696" y1="364" y2="364" stroke="#e5e5ea"/><text x="56" y="368" text-anchor="end" fill="#6e6e73">0%</text>
+<line x1="64" x2="696" y1="296.8" y2="296.8" stroke="#e5e5ea"/><text x="56" y="300.8" text-anchor="end" fill="#6e6e73">20%</text>
+<line x1="64" x2="696" y1="229.6" y2="229.6" stroke="#e5e5ea"/><text x="56" y="233.6" text-anchor="end" fill="#6e6e73">40%</text>
+<line x1="64" x2="696" y1="162.39999999999998" y2="162.39999999999998" stroke="#e5e5ea"/><text x="56" y="166.39999999999998" text-anchor="end" fill="#6e6e73">60%</text>
+<line x1="64" x2="696" y1="95.19999999999999" y2="95.19999999999999" stroke="#e5e5ea"/><text x="56" y="99.19999999999999" text-anchor="end" fill="#6e6e73">80%</text>
+<line x1="64" x2="696" y1="28" y2="28" stroke="#e5e5ea"/><text x="56" y="32" text-anchor="end" fill="#6e6e73">100%</text>
+<line x1="190.4" x2="190.4" y1="28" y2="364" stroke="#c7c7cc" stroke-dasharray="3 3"/><text x="190.4" y="380" text-anchor="middle" fill="#6e6e73">8 KiB</text>
+<line x1="316.8" x2="316.8" y1="28" y2="364" stroke="#c7c7cc" stroke-dasharray="3 3"/><text x="316.8" y="380" text-anchor="middle" fill="#6e6e73">16 KiB</text>
+<line x1="443.2" x2="443.2" y1="28" y2="364" stroke="#c7c7cc" stroke-dasharray="3 3"/><text x="443.2" y="380" text-anchor="middle" fill="#6e6e73">32 KiB</text>
+<line x1="569.6" x2="569.6" y1="28" y2="364" stroke="#c7c7cc" stroke-dasharray="3 3"/><text x="569.6" y="380" text-anchor="middle" fill="#6e6e73">64 KiB</text>
+<line x1="646.6585559688131" x2="646.6585559688131" y1="28" y2="364" stroke="#c7c7cc" stroke-dasharray="3 3"/><text x="646.6585559688131" y="380" text-anchor="middle" fill="#6e6e73">100 kB</text>
+<text x="380" y="406" text-anchor="middle" fill="#1d1d1f">total distributed bytes (minified JS + model), log scale</text>
+<text x="16" y="196" transform="rotate(-90 16 196)" text-anchor="middle" fill="#1d1d1f">exact match, unknown common words</text>
+<polyline fill="none" stroke="#8e8e93" stroke-width="2" points="316.28729224549,234.05714285714288 435.72522717586605,198.39999999999998"/>
+<circle cx="316.28729224549" cy="234.05714285714288" r="4" fill="#8e8e93"/>
+<circle cx="435.72522717586605" cy="198.39999999999998" r="4" fill="#8e8e93"/>
+<rect x="76" y="34" width="10" height="10" fill="#8e8e93"/><text x="92" y="43" fill="#1d1d1f">A Symbolic only</text>
+<polyline fill="none" stroke="#d1495b" stroke-width="2" points="161.77689018856302,355.0857142857143 312.41813822118377,287.88571428571424 431.5555865650313,232.00000000000003 551.8850647557676,194.6285714285714 627.4251019812649,194.2857142857143"/>
+<circle cx="161.77689018856302" cy="355.0857142857143" r="4" fill="#d1495b"/>
+<circle cx="312.41813822118377" cy="287.88571428571424" r="4" fill="#d1495b"/>
+<circle cx="431.5555865650313" cy="232.00000000000003" r="4" fill="#d1495b"/>
+<circle cx="551.8850647557676" cy="194.6285714285714" r="4" fill="#d1495b"/>
+<circle cx="627.4251019812649" cy="194.2857142857143" r="4" fill="#d1495b"/>
+<rect x="76" y="52" width="10" height="10" fill="#d1495b"/><text x="92" y="61" fill="#1d1d1f">B Neural only (BiGRU)</text>
+<polyline fill="none" stroke="#0a66c2" stroke-width="2" points="317.8211111337476,191.54285714285712 443.6946210158383,122.97142857142856 569.8474782080484,112.34285714285714 646.8280688449843,113.53971486761712"/>
+<circle cx="317.8211111337476" cy="191.54285714285712" r="4" fill="#0a66c2"/>
+<circle cx="443.6946210158383" cy="122.97142857142856" r="4" fill="#0a66c2"/>
+<circle cx="569.8474782080484" cy="112.34285714285714" r="4" fill="#0a66c2"/>
+<circle cx="646.8280688449843" cy="113.53971486761712" r="4" fill="#0a66c2"/>
+<rect x="76" y="70" width="10" height="10" fill="#0a66c2"/><text x="92" y="79" fill="#1d1d1f">C Neuro-symbolic</text>
+<polyline fill="none" stroke="#2a9d8f" stroke-width="2" points="317.78790405850924,247.42857142857144 443.7057206964777,190.85714285714286 569.8613715190274,184.34285714285716 646.8244250641991,180.57142857142858"/>
+<circle cx="317.78790405850924" cy="247.42857142857144" r="4" fill="#2a9d8f"/>
+<circle cx="443.7057206964777" cy="190.85714285714286" r="4" fill="#2a9d8f"/>
+<circle cx="569.8613715190274" cy="184.34285714285716" r="4" fill="#2a9d8f"/>
+<circle cx="646.8244250641991" cy="180.57142857142858" r="4" fill="#2a9d8f"/>
+<rect x="76" y="88" width="10" height="10" fill="#2a9d8f"/><text x="92" y="97" fill="#1d1d1f">D Compressed dictionary</text>
+</svg>

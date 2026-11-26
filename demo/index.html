@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>tiny-furigana-food demo</title>
+<style>
+  :root { color-scheme: light dark; --fg: #1d1d1f; --muted: #6e6e73; --line: #d2d2d7; --bg: #fff; --accent: #0a66c2; }
+  @media (prefers-color-scheme: dark) { :root { --fg: #f5f5f7; --muted: #a1a1a6; --line: #3a3a3c; --bg: #1c1c1e; --accent: #4da3ff; } }
+  body { font: 16px/1.6 system-ui, "Hiragino Sans", "Noto Sans JP", sans-serif; color: var(--fg); background: var(--bg); max-width: 40rem; margin: 3rem auto; padding: 0 1.25rem; }
+  h1 { font-size: 1.4rem; margin: 0 0 .25rem; }
+  p.lead { color: var(--muted); margin: 0 0 2rem; }
+  label { display: block; font-size: .85rem; color: var(--muted); margin: 1.25rem 0 .35rem; }
+  input { width: 100%; box-sizing: border-box; font: inherit; padding: .6rem .75rem; border: 1px solid var(--line); border-radius: .5rem; background: transparent; color: inherit; }
+  input:focus { outline: 2px solid var(--accent); outline-offset: 1px; }
+  .hint { font-size: .8rem; color: var(--muted); margin-top: .35rem; min-height: 1.2em; }
+  .chips { display: flex; flex-wrap: wrap; gap: .4rem; margin-top: 1.5rem; }
+  .chips button { font: inherit; font-size: .85rem; padding: .25rem .65rem; border: 1px solid var(--line); border-radius: 999px; background: transparent; color: inherit; cursor: pointer; }
+  footer { margin-top: 3rem; font-size: .75rem; color: var(--muted); }
+  footer a { color: inherit; }
+</style>
+</head>
+<body>
+<h1>tiny-furigana-food</h1>
+<p class="lead">100 KB 未満・完全オフラインのふりがな自動入力デモ。推定結果はそのまま手で修正できます。</p>
+
+<label for="name">商品名</label>
+<input id="name" autocomplete="off" placeholder="例: 宇治抹茶ラテ" disabled>
+<label for="kana">ふりがな</label>
+<input id="kana" autocomplete="off">
+<div class="hint" id="status">モデルを読み込み中…</div>
+
+<div class="chips" id="chips"></div>
+
+<footer>
+  Reading data derived from JMdict / KANJIDIC2 / JMnedict (© EDRDG, CC BY-SA 4.0,
+  <a href="https://www.edrdg.org/edrdg/licence.html">licence</a>) and JmdictFurigana.
+  See <code>docs/DATA_SOURCES.md</code>.
+</footer>
+
+<script type="module">
+  import { createReader } from "../dist/tiny-g2p.min.js";
+  const $ = (id) => document.getElementById(id);
+  const t0 = performance.now();
+  const read = await createReader({ url: new URL("../dist/model.bin", import.meta.url) });
+  const initMs = performance.now() - t0;
+  const name = $("name"), kana = $("kana"), status = $("status");
+  let edited = false; // once the user corrects the furigana by hand, stop overwriting it
+  kana.addEventListener("input", () => { edited = kana.value !== ""; });
+  const update = () => {
+    if (edited) return;
+    const s = performance.now();
+    kana.value = read(name.value);
+    status.textContent = `推定 ${((performance.now() - s) * 1000).toFixed(0)} µs ・ 初期化 ${initMs.toFixed(0)} ms`;
+  };
+  name.addEventListener("input", update);
+  name.disabled = false;
+  name.focus();
+  status.textContent = `初期化 ${initMs.toFixed(0)} ms`;
+  for (const ex of ["大根", "豚バラ肉", "冷凍枝豆", "生ビール", "宇治抹茶", "十勝バター", "北海道産じゃがいも", "牛乳500ml"]) {
+    const b = document.createElement("button");
+    b.textContent = ex;
+    b.onclick = () => { name.value = ex; edited = false; update(); };
+    $("chips").append(b);
+  }
+</script>
+</body>
+</html>

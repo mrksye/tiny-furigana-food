@@ -1,0 +1,49 @@
+{
+  "model": "R-135k-ct",
+  "budget": 200000,
+  "files": [
+    {
+      "file": "dist/tiny-g2p.min.js",
+      "raw": 8589,
+      "gzip": 3945,
+      "brotli": 3603
+    },
+    {
+      "file": "dist/model.bin",
+      "raw": 130656,
+      "gzip": 127120,
+      "brotli": 124890
+    },
+    {
+      "file": "TOTAL",
+      "raw": 139245,
+      "gzip": 131065,
+      "brotli": 128493
+    }
+  ],
+  "variants": [
+    {
+      "model": "R-100k-mf",
+      "files": [
+        {
+          "file": "dist/tiny-g2p.min.js",
+          "raw": 8589,
+          "gzip": 3945,
+          "brotli": 3603
+        },
+        {
+          "file": "dist/model-100k.bin",
+          "raw": 91396,
+          "gzip": 89700,
+          "brotli": 88337
+        },
+        {
+          "file": "TOTAL",
+          "raw": 99985,
+          "gzip": 93645,
+          "brotli": 91940
+        }
+      ]
+    }
+  ]
+}
