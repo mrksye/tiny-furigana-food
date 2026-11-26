@@ -1,19 +1,19 @@
 # tiny-furigana-food
 
-> 構成図・ビルドパイプライン・設定一覧: **[docs/ARCHITECTURE.md](docs/ARCHITECTURE.md)**（mermaid） ・ 研究レポート: **[docs/REPORT.md](docs/REPORT.md)**
+**English** | [日本語版 README はこちら](README.ja.md)
 
-**約 140 KB（100 KB 未満の小型版あり）で動く、食品名に特化した日本語の読み仮名（ふりがな）推定エンジン。** Pure TypeScript・依存ゼロ・WASM なし・完全オフライン。
+> Architecture diagrams, build pipeline and configuration: **[docs/ARCHITECTURE.md](docs/ARCHITECTURE.md)** (mermaid) · Research report (Japanese): **[docs/REPORT.md](docs/REPORT.md)**
 
-*An ultra-light neuro-symbolic Japanese grapheme-to-phoneme (furigana) engine specialised for food product names: ~140 KB in total (JS + model), or < 100,000 bytes for the strict variant; pure TypeScript, zero runtime dependencies, no WASM, fully offline.*
+**A neuro-symbolic Japanese furigana (grapheme-to-phoneme) engine specialised for food product names, in ~140 KB (or under 100 KB with the smaller model).** Pure TypeScript, zero runtime dependencies, no WASM, fully offline.
 
-> **研究段階です。** 食品名と地名に絞って精度を出しており、一般的な文章の読みには向かない。汎用の読み推定エンジンを名乗るほどではないため、名前に `-food` を付けている。
+> **Research stage.** Accuracy is focused on food names and place names; it is not meant for reading general Japanese text. It does not claim to be a general-purpose reading engine, hence the `-food` suffix.
 
-本研究は、食品の商品登録フォームでのふりがな自動入力を題材にしている。ただし、次の考え方は題材に依存しない。
+The case study is automatic furigana input for a food product registration form. The ideas themselves do not depend on that domain:
 
-- シンボリックな候補生成と、極小の学習スコアラーと、容量予算の中で選ぶ例外辞書を組み合わせる
-- それぞれにバイト単位で容量を配分する
+- combine symbolic candidate generation, a tiny learned scorer, and an exception lexicon chosen within a size budget
+- allocate the byte budget explicitly between them
 
-分野ごとの語彙（品名・地名・社名など）を持つ、ほかの入力補助にも流用できると考えている。
+We expect the same approach to carry over to other input helpers with domain vocabulary (product names, place names, company names, and so on).
 
 ```bash
 npm install @mrksye/tiny-furigana-food
@@ -28,90 +28,91 @@ read("八街落花生");    // "やちまたらっかせい"
 read("牛乳500ml");     // "ぎゅうにゅう500ml"
 ```
 
-初期化後の `read` は同期・決定論的に動く。推定できない文字は削除も置換もせず、原文のまま返す。**結果はユーザーが手で直す前提**の設計になっている。
+After initialisation, `read` is synchronous and deterministic. Characters it cannot read are returned as they are, never dropped or replaced. **The design assumes the user corrects the result by hand.**
 
-## サイズと精度
+## Size and accuracy
 
-| 配布物 | 既定（バランス版 `R-135k-ct`） | 100 KB 厳守版（`R-100k-mf`） |
+| Artifact | Default (balanced, `R-135k-ct`) | Strict 100 KB (`R-100k-mf`) |
 |---|---|---|
 | `dist/tiny-g2p.min.js` | 8,589 B | 8,589 B |
-| モデル | `dist/model.bin` 130,656 B | `dist/model-100k.bin` 91,396 B |
-| **合計（非圧縮）** | **139,245 B** | **99,985 B** |
+| Model | `dist/model.bin` 130,656 B | `dist/model-100k.bin` 91,396 B |
+| **Total (uncompressed)** | **139,245 B** | **99,985 B** |
 | gzip / brotli | 131,065 / 128,493 B | 93,645 / 91,940 B |
 
-100 KB 版に切り替えるときは `createReader({ url })` に `model-100k.bin` の URL を渡す（使い方の節を参照）。
+To use the 100 KB variant, pass the URL of `model-100k.bin` to `createReader({ url })` (see [Loading the model](#loading-the-model)).
 
-| 評価 | バランス版 | 100 KB 版 |
+| Evaluation | Balanced | 100 KB |
 |---|---|---|
-| 実在のキッチンカー商品名 64 件（非公開データ・学習には不使用） | **96.9%** | 89.1% |
-| 仕様書の入出力例 18 件 | 15/18 | 10/18 |
-| 有名な既知地名 | 88.4% | 55.7% |
-| 既知語 | 98.5% | 94.7% |
-| **未知語**（学習から除外した語。同じ設定を評価用データで学習したモデルで測定） | 74.9% | 75.4% |
-| 未知の複合語（同上） | 80.3% | 80.6% |
+| 64 real food-truck menu items (private data, not used for training) | **96.9%** | 89.1% |
+| 18 input/output examples from the specification | 15/18 | 10/18 |
+| Well-known place names (seen in training) | 88.4% | 55.7% |
+| Known words | 98.5% | 94.7% |
+| **Unknown words** (held out of training; measured with the same configuration trained without the evaluation data) | 74.9% | 75.4% |
+| Unknown compounds (same as above) | 80.3% | 80.6% |
 
-長音の表記揺れ（じゅーす / じゅうす）は誤りとして数えない。
-配布モデルは全データで学習しているので、未知語の数値は「学習から除外した版」で測っている。測り方の詳細は REPORT §6.11 を参照。
-変更を入れるときは、正解率に加えて「前の版で正解だった入力が誤りに変わっていないか」を全評価セットで確認している（`research/tools/regress.ts`、REPORT §6.12）。
-推論時間は 1 入力あたり約 13 µs、初期化は約 9〜17 ms（Bun 1.4.5、Linux）。ブラウザでは計測していない。
+Long-vowel spelling variants (じゅーす / じゅうす) are not counted as errors.
+The released models are trained on all data, so unknown-word accuracy is measured on held-out builds. See REPORT §6.11 for the method.
+Every change is checked not only for accuracy but also for inputs that were correct before and became wrong, across all evaluation sets (`research/tools/regress.ts`, REPORT §6.12).
+Inference takes about 13 µs per input and initialisation about 9–17 ms (Bun 1.4.5, Linux). Not measured in browsers.
 
-### 既存ライブラリとのサイズ比較
+### Size compared with existing libraries
 
-公開パッケージを取得して実測した（2026-11-25、npm / PyPI の最新版）。「読みに必要な部分」は、漢字の読みを出すのに要る解析器本体と辞書の合計。
+Measured from the published packages (2026-11-25, latest versions on npm / PyPI). "Needed for readings" is the analyser plus the dictionary required to produce kanji readings.
 
-| ライブラリ | 方式 | 読みに必要な部分 | 圧縮時 |
+| Library | Method | Needed for readings | Compressed |
 |---|---|---|---|
-| **tiny-furigana-food**（既定 / 100 KB 版） | ルール + 線形 CRF + 例外辞書 | **139,245 B / 99,985 B** | gzip 131 KB / 94 KB |
-| kuromoji.js 0.1.2（kuroshiro が使う解析器） | 形態素解析 + IPADIC | `dict/` 100.3 MB（展開後）+ `kuromoji.js` 308 KB | 配布時 gzip 17.8 MB + 67 KB |
-| pykakasi 2.3.0 | 辞書引き | 9.9 MB（`kanwadict4.db` 9.75 MB） | wheel 2.4 MB |
-| ipadic 1.0.0（MeCab 用辞書） | 形態素解析 | 52.9 MB | sdist 13.4 MB |
-| SudachiDict-small 20261015 | 形態素解析 | 115.3 MB | wheel 42.5 MB |
-| SudachiDict-core 20261015 | 形態素解析 | 202.3 MB | wheel 76.9 MB |
-| unidic-lite 1.0.8（MeCab 用辞書） | 形態素解析 | 260.5 MB | sdist 47.4 MB |
-| wanakana 5.3.1（参考） | かな⇔ローマ字のみ。漢字は読めない | 20,733 B | gzip 7.0 KB |
+| **tiny-furigana-food** (default / 100 KB) | rules + linear CRF + exception lexicon | **139,245 B / 99,985 B** | gzip 131 KB / 94 KB |
+| kuromoji.js 0.1.2 (the analyser used by kuroshiro) | morphological analysis + IPADIC | `dict/` 100.3 MB (unpacked) + `kuromoji.js` 308 KB | gzip 17.8 MB + 67 KB as shipped |
+| pykakasi 2.3.0 | dictionary lookup | 9.9 MB (`kanwadict4.db` 9.75 MB) | wheel 2.4 MB |
+| ipadic 1.0.0 (MeCab dictionary) | morphological analysis | 52.9 MB | sdist 13.4 MB |
+| SudachiDict-small 20261015 | morphological analysis | 115.3 MB | wheel 42.5 MB |
+| SudachiDict-core 20261015 | morphological analysis | 202.3 MB | wheel 76.9 MB |
+| unidic-lite 1.0.8 (MeCab dictionary) | morphological analysis | 260.5 MB | sdist 47.4 MB |
+| wanakana 5.3.1 (reference) | kana ⇔ romaji only; cannot read kanji | 20,733 B | gzip 7.0 KB |
 
-ブラウザで漢字を読めるもののうち最小の kuromoji.js と比べても、転送量は約 1/140 になる。
-ただし上の形態素解析器は、大規模辞書によって一般語の読みをほぼ正しく出せる。tiny-furigana-food の未知語の正解率（約 75%）はそれに及ばない。
-小ささと引き換えに、食品名と地名に絞って精度を確保している。
-精度は同じデータで比較していない。
+Even against kuromoji.js, the smallest of these that reads kanji in the browser, the transfer size is about 1/140.
+On the other hand, those morphological analysers read general vocabulary almost perfectly thanks to their large dictionaries, and tiny-furigana-food's unknown-word accuracy (about 75%) falls short of that.
+In exchange for its size, it keeps its accuracy by focusing on food names and place names.
+Accuracy has not been compared on the same data.
 
-## 仕組み
+## How it works
 
 ```
-NFKC 正規化 → 文字種判定 → 候補ラティス（単漢字の読み候補・連濁/促音/半濁の任意適用・例外辞書）
-           → 線形ハッシュ特徴量によるスコアリング（CRF で学習、int4）→ Viterbi → ひらがな
+NFKC normalisation → character classes → candidate lattice (per-kanji reading candidates,
+                     optional rendaku / gemination / handakuten, exception lexicon)
+                   → scoring with hashed linear features (CRF-trained, int4) → Viterbi → hiragana
 ```
 
-シンボリック層・極小ニューラル（線形）層・辞書のみ・ニューラルのみの 4 方式を、同じ容量予算と同じ評価データで比較した。その結果と技術選定の理由は **[docs/REPORT.md](docs/REPORT.md)** にまとめてある。主な知見は次のとおり。
+Four approaches — symbolic layer, tiny neural (linear) layer, lexicon only, and neural only — were compared under the same size budget and the same evaluation data. The results and the reasoning behind the design are in **[docs/REPORT.md](docs/REPORT.md)** (Japanese). Main findings:
 
-- 正解はラティスの候補に 95% 含まれる。問題は「どれを選ぶか」で、効いたのは**候補 × 文脈の連言特徴量をハッシュで引く線形 CRF**だった。同じパラメータ数なら MLP は線形に勝てなかった。
-- 例外辞書は既知語に効き、重みは未知語に効く。容量を 200 KB まで広げても未知語は 75〜76% で横ばいで、追加容量が効くのは食品語・地名の記憶だった。その効果も 135 KB で飽和する。
-- 実利用で効いたのはデータの穴埋めだった。カタカナ読みの語（餃子・烏龍茶）の回収、語釈による食品語の判定、郵便番号データの市区町村名とその語幹（宇治・十勝）を入れたことが大きい。
-- 正準ハフマン符号化・MSE 最適の量子化スケール・事前スコアの廃止（候補の並び順で代用）によって、同じ精度のまま約 30% 縮んだ。
+- The correct reading is among the lattice candidates 95% of the time. The problem is choosing among them, and what worked was **a linear CRF over hashed candidate × context conjunction features**. At the same parameter count, an MLP did not beat the linear model.
+- The exception lexicon helps known words; the weights help unknown words. Growing the budget to 200 KB leaves unknown-word accuracy flat at 75–76%; extra capacity only buys memorisation of food words and place names, and that saturates at 135 KB.
+- In real use, filling data gaps mattered most: recovering words whose readings are written in katakana (餃子, 烏龍茶), detecting food words from their glosses, and adding municipality names and their stems from postal code data (宇治, 十勝).
+- Canonical Huffman coding, MSE-optimal quantisation scales, and dropping prior scores (using candidate order instead) shrank the model by about 30% at the same accuracy.
 
 ![Pareto](research/results/pareto.svg)
 
-## ディレクトリ
+## Directory layout
 
-使うだけなら `src/` と `dist/` だけ見ればよい。依存は `src` ← `train` ← `research` の一方向で、`src/` は他のディレクトリを読まない。
+If you only use the library, `src/` and `dist/` are all you need. Dependencies go one way, `src` ← `train` ← `research`, and `src/` reads no other directory.
 
 ```
-src/         ライブラリ本体（ブラウザで実行）。公開 API は reader.ts
-dist/        配布物（tiny-g2p.min.js・node.js・tiny-g2p.d.ts・model.bin・model-100k.bin・SIZES.json）
-demo/        ブラウザデモ
+src/         the library (runs in the browser); public API in reader.ts
+dist/        distributed files (tiny-g2p.min.js, node.js, tiny-g2p.d.ts, model.bin, model-100k.bin, SIZES.json)
+demo/        browser demo
 tests/       bun test
-train/       配布モデルを作る道具（Bun: 学習・例外辞書・符号化・バンドル、prep/: Python の前処理）
-research/    研究と比較の一式
-  runtime/   実験用の推論（二周ループ・ニューラルのみの方式 B）
-  tools/     評価・回帰チェック・実験の実行・集計・図・ベンチ
-  neural/    方式 B の学習（PyTorch）
-  models/    比較用と配布候補のモデル
-  data/eval/ 評価セット
-  results/   全実験の結果（results.jsonl・experiments.md）・ログ・パレート図
-docs/        研究レポート・アーキテクチャ・データの出典
+train/       tools that build the released model (Bun: training, exception lexicon, encoding, bundling; prep/: Python preprocessing)
+research/    research and comparisons
+  runtime/   experimental decoders (two-pass loop, neural-only system B)
+  tools/     evaluation, regression checks, experiment runner, summaries, plots, benchmarks
+  neural/    training for system B (PyTorch)
+  models/    models for comparison and release candidates
+  data/eval/ evaluation sets
+  results/   results of every experiment (results.jsonl, experiments.md), logs, Pareto plot
+docs/        research report, architecture, data sources
 ```
 
-## 使い方
+## Usage
 
 ```bash
 bun install
@@ -120,31 +121,31 @@ bun run research/tools/serve.ts   # demo at http://localhost:8787/demo/
 bun run research/tools/bench.ts   # init / latency / heap
 ```
 
-### モデルの読み込み
+### Loading the model
 
-`createReader()` は、モジュールと同じ場所にある `model.bin` を一度だけ読み込む。
+`createReader()` loads `model.bin` from next to the module, once.
 
-- **ブラウザ**：`fetch` で取得する。バンドラーを使う場合は、`model.bin` がモジュールと同じ場所に配信されるようにするか、下の `url` / `data` で取得元を指定する。
-- **Node / Bun / Deno**：`package.json` の `node` 条件で `dist/node.js` が選ばれ、ファイルから直接読む（Node の `fetch` は `file:` URL を読めないため）。ブラウザ向けのバンドルにはこの処理を含めていない。
+- **Browser**: fetched with `fetch`. With a bundler, either make sure `model.bin` is served next to the module, or point to it with `url` / `data` below.
+- **Node / Bun / Deno**: the `node` condition in `package.json` selects `dist/node.js`, which reads the file from disk (Node's `fetch` cannot read `file:` URLs). This code is not included in the browser bundle.
 
-取得元は `url` で、モデルのバイト列（`ArrayBuffer` か `Uint8Array`）は `data` で渡せる。
+Pass a location with `url`, or the model bytes (`ArrayBuffer` or `Uint8Array`) with `data`.
 
 ```ts
-// 100 KB 版（Node）
+// 100 KB variant (Node)
 const read = await createReader({ url: new URL("./model-100k.bin", import.meta.resolve("@mrksye/tiny-furigana-food")) });
 
-// 自前で配信している URL から取得（ブラウザ）
+// From a URL you serve yourself (browser)
 const read2 = await createReader({ url: "/assets/model-100k.bin" });
 
-// バイト列を渡す
+// Pass the bytes
 const read3 = await createReader({ data: await (await fetch("/assets/model.bin")).arrayBuffer() });
 ```
 
-学習から再現する手順は [docs/REPORT.md §10](docs/REPORT.md#10-再現手順) にある。生データはリポジトリに含めていない。
+Steps to reproduce from training are in [docs/REPORT.md §10](docs/REPORT.md#10-再現手順) (Japanese). Raw data is not included in the repository.
 
-## ライセンス
+## License
 
-- **データ由来のファイル**（`dist/*.bin`、`research/models/*.bin`、`research/data/eval/*.tsv`）は JMdict・KANJIDIC2・JMnedict（© Electronic Dictionary Research and Development Group）に由来する。そのため [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/) で配布する。アプリに組み込む場合は、出典の表示とライセンスへのリンクが必要。詳細は **[docs/DATA_SOURCES.md](docs/DATA_SOURCES.md)** を参照。
-- **ソースコード**（`src/`、`train/`、`research/` のコード、`tests/`、`demo/`）は [MIT](LICENSE)。
+- **Data-derived files** (`dist/*.bin`, `research/models/*.bin`, `research/data/eval/*.tsv`) are derived from JMdict, KANJIDIC2 and JMnedict (© Electronic Dictionary Research and Development Group) and are therefore distributed under [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/). Apps that embed them must show attribution and a link to the licence. See **[docs/DATA_SOURCES.md](docs/DATA_SOURCES.md)**.
+- **Source code** (`src/`, `train/`, code under `research/`, `tests/`, `demo/`) is [MIT](LICENSE).
 
 This package uses the [JMdict](https://www.edrdg.org/wiki/index.php/JMdict-EDICT_Dictionary_Project), [KANJIDIC2](https://www.edrdg.org/wiki/index.php/KANJIDIC_Project) and JMnedict dictionary files. These files are the property of the [Electronic Dictionary Research and Development Group](https://www.edrdg.org/), and are used in conformance with the Group's [licence](https://www.edrdg.org/edrdg/licence.html). Per-character reading alignments come from [JmdictFurigana](https://github.com/Doublevil/JmdictFurigana).
