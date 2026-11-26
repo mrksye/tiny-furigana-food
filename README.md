@@ -1,6 +1,6 @@
 # tiny-furigana-food
 
-**English** | [日本語版 README はこちら](README.ja.md)
+**English** | [日本語版 README はこちら](docs/README.ja.md)
 
 > Architecture diagrams, build pipeline and configuration: **[docs/ARCHITECTURE.md](docs/ARCHITECTURE.md)** (mermaid) · Research report (Japanese): **[docs/REPORT.md](docs/REPORT.md)**
 
@@ -109,7 +109,7 @@ research/    research and comparisons
   models/    models for comparison and release candidates
   data/eval/ evaluation sets
   results/   results of every experiment (results.jsonl, experiments.md), logs, Pareto plot
-docs/        research report, architecture, data sources
+docs/        research report, architecture, data sources, Japanese README
 ```
 
 ## Usage

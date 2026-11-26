@@ -1,8 +1,8 @@
 # tiny-furigana-food
 
-[English](README.md) | **日本語**
+[English](../README.md) | **日本語**
 
-> 構成図・ビルドパイプライン・設定一覧: **[docs/ARCHITECTURE.md](docs/ARCHITECTURE.md)**（mermaid） ・ 研究レポート: **[docs/REPORT.md](docs/REPORT.md)**
+> 構成図・ビルドパイプライン・設定一覧: **[docs/ARCHITECTURE.md](ARCHITECTURE.md)**（mermaid） ・ 研究レポート: **[docs/REPORT.md](REPORT.md)**
 
 **約 140 KB（100 KB 未満の小型版あり）で動く、食品名に特化した日本語の読み仮名（ふりがな）推定エンジン。** Pure TypeScript・依存ゼロ・WASM なし・完全オフライン。
 
@@ -82,14 +82,14 @@ NFKC 正規化 → 文字種判定 → 候補ラティス（単漢字の読み�
            → 線形ハッシュ特徴量によるスコアリング（CRF で学習、int4）→ Viterbi → ひらがな
 ```
 
-シンボリック層・極小ニューラル（線形）層・辞書のみ・ニューラルのみの 4 方式を、同じ容量予算と同じ評価データで比較した。その結果と技術選定の理由は **[docs/REPORT.md](docs/REPORT.md)** にまとめてある。主な知見は次のとおり。
+シンボリック層・極小ニューラル（線形）層・辞書のみ・ニューラルのみの 4 方式を、同じ容量予算と同じ評価データで比較した。その結果と技術選定の理由は **[docs/REPORT.md](REPORT.md)** にまとめてある。主な知見は次のとおり。
 
 - 正解はラティスの候補に 95% 含まれる。問題は「どれを選ぶか」で、効いたのは**候補 × 文脈の連言特徴量をハッシュで引く線形 CRF**だった。同じパラメータ数なら MLP は線形に勝てなかった。
 - 例外辞書は既知語に効き、重みは未知語に効く。容量を 200 KB まで広げても未知語は 75〜76% で横ばいで、追加容量が効くのは食品語・地名の記憶だった。その効果も 135 KB で飽和する。
 - 実利用で効いたのはデータの穴埋めだった。カタカナ読みの語（餃子・烏龍茶）の回収、語釈による食品語の判定、郵便番号データの市区町村名とその語幹（宇治・十勝）を入れたことが大きい。
 - 正準ハフマン符号化・MSE 最適の量子化スケール・事前スコアの廃止（候補の並び順で代用）によって、同じ精度のまま約 30% 縮んだ。
 
-![Pareto](research/results/pareto.svg)
+![Pareto](../research/results/pareto.svg)
 
 ## ディレクトリ
 
@@ -108,7 +108,7 @@ research/    研究と比較の一式
   models/    比較用と配布候補のモデル
   data/eval/ 評価セット
   results/   全実験の結果（results.jsonl・experiments.md）・ログ・パレート図
-docs/        研究レポート・アーキテクチャ・データの出典
+docs/        研究レポート・アーキテクチャ・データの出典・日本語版 README（このファイル）
 ```
 
 ## 使い方
@@ -140,11 +140,11 @@ const read2 = await createReader({ url: "/assets/model-100k.bin" });
 const read3 = await createReader({ data: await (await fetch("/assets/model.bin")).arrayBuffer() });
 ```
 
-学習から再現する手順は [docs/REPORT.md §10](docs/REPORT.md#10-再現手順) にある。生データはリポジトリに含めていない。
+学習から再現する手順は [docs/REPORT.md §10](REPORT.md#10-再現手順) にある。生データはリポジトリに含めていない。
 
 ## ライセンス
 
-- **データ由来のファイル**（`dist/*.bin`、`research/models/*.bin`、`research/data/eval/*.tsv`）は JMdict・KANJIDIC2・JMnedict（© Electronic Dictionary Research and Development Group）に由来する。そのため [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/) で配布する。アプリに組み込む場合は、出典の表示とライセンスへのリンクが必要。詳細は **[docs/DATA_SOURCES.md](docs/DATA_SOURCES.md)** を参照。
-- **ソースコード**（`src/`、`train/`、`research/` のコード、`tests/`、`demo/`）は [MIT](LICENSE)。
+- **データ由来のファイル**（`dist/*.bin`、`research/models/*.bin`、`research/data/eval/*.tsv`）は JMdict・KANJIDIC2・JMnedict（© Electronic Dictionary Research and Development Group）に由来する。そのため [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/) で配布する。アプリに組み込む場合は、出典の表示とライセンスへのリンクが必要。詳細は **[docs/DATA_SOURCES.md](DATA_SOURCES.md)** を参照。
+- **ソースコード**（`src/`、`train/`、`research/` のコード、`tests/`、`demo/`）は [MIT](../LICENSE)。
 
 This package uses the [JMdict](https://www.edrdg.org/wiki/index.php/JMdict-EDICT_Dictionary_Project), [KANJIDIC2](https://www.edrdg.org/wiki/index.php/KANJIDIC_Project) and JMnedict dictionary files. These files are the property of the [Electronic Dictionary Research and Development Group](https://www.edrdg.org/), and are used in conformance with the Group's [licence](https://www.edrdg.org/edrdg/licence.html). Per-character reading alignments come from [JmdictFurigana](https://github.com/Doublevil/JmdictFurigana).
