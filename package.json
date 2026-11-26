@@ -1,9 +1,8 @@
 {
   "name": "@mrksye/tiny-furigana-food",
   "version": "0.1.0",
-  "private": true,
   "type": "module",
-  "description": "Neuro-symbolic Japanese furigana for food names in under 100 KB: rule-based candidates + a tiny linear CRF + a budgeted exception lexicon",
+  "description": "Neuro-symbolic Japanese furigana for food names in ~140 KB (or under 100 KB with the smaller model): rule-based candidates + a tiny linear CRF + a budgeted exception lexicon",
   "author": "mrksye <mrksye@gmail.com>",
   "repository": {
     "type": "git",

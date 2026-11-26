@@ -2,9 +2,9 @@
 
 > 構成図・ビルドパイプライン・設定一覧: **[docs/ARCHITECTURE.md](docs/ARCHITECTURE.md)**（mermaid） ・ 研究レポート: **[docs/REPORT.md](docs/REPORT.md)**
 
-**100〜135 KB で動く、食品名に特化した日本語の読み仮名（ふりがな）推定エンジン。** Pure TypeScript・依存ゼロ・WASM なし・完全オフライン。
+**約 140 KB（100 KB 未満の小型版あり）で動く、食品名に特化した日本語の読み仮名（ふりがな）推定エンジン。** Pure TypeScript・依存ゼロ・WASM なし・完全オフライン。
 
-*An ultra-light neuro-symbolic Japanese grapheme-to-phoneme (furigana) engine specialised for food product names: ~135 KB in total (JS + model), or < 100,000 bytes for the strict variant; pure TypeScript, zero runtime dependencies, no WASM, fully offline.*
+*An ultra-light neuro-symbolic Japanese grapheme-to-phoneme (furigana) engine specialised for food product names: ~140 KB in total (JS + model), or < 100,000 bytes for the strict variant; pure TypeScript, zero runtime dependencies, no WASM, fully offline.*
 
 > **研究段階です。** 食品名と地名に絞って精度を出しており、一般的な文章の読みには向かない。汎用の読み推定エンジンを名乗るほどではないため、名前に `-food` を付けている。
 
